@@ -1,0 +1,90 @@
+.TH "StrAl" "1" "0.5.3" "Deniz Dalli" ""
+.SH "NAME"
+StrAL \- multiple alignment of non\-coding RNA using base pairing probability vectors
+.SH "SYNOPSIS"
+\fBstral\fR \fI[options]\fR <sequence\-file>
+.SH "DESCRIPTION"
+StrAl is a tool for multiple alignment of RNA sequences. It follows the strategy of ClustalW, but taking into account both, sequence information as well as the intrinsic structural information of the RNA sequence as calculated by RNAfold. 
+
+StrAl can handle nearly every sequence format. Its output is in vienna
+format (concatenated fasta).
+.SH "OPTIONS"
+\-A #
+
+	weighting of structural term vs sequence term
+
+\-G #
+
+	gap open penalty in pairwise alignment mode
+
+\-E #
+
+	gap extension penalty in pairwise alignment mode
+
+\-O #
+
+	gap open penalty in MSA
+
+\-M #
+
+	gap extension penalty in MSA
+
+\-N
+
+	use Neighbor\-Joining method to construct a guide tree, default is UPGMA
+
+\-W
+
+	use the Midpoint\-Method, assingning sequences a specific weight
+
+\-r
+
+	same as Option \-W, but without weighting the sequences
+
+\-b
+
+	use BIONJ's guide tree
+
+\-w
+
+	use Weighbor's guide tree
+
+\-R
+
+	change to Gotoh's substitution\-matrix, RIBOSUM85\-60 is default
+
+\-P
+
+	using negative values in substitution\-matrix
+
+\-\-no\-freeendgaps
+
+	change to full global alignment, end gaps will be charged
+
+\-T #
+
+	folding temperature of RNA Sequences
+
+\-p
+
+	printing pairwise alignments to file
+
+\-n
+
+	don't print any program output to files
+
+
+.SH "VERSION"
+This manpage documents StrAl version 0.5.3
+.SH "AUTHOR"
+Deniz Dalli <dalli@biophys.uni\-duesseldorf.de>
+.SH "REFERENCE"
+If you like StrAl please cite:
+.br 
+Dalli et al. (2006)
+.br 
+Progressive alignment of non-coding RNA using base pairing probability vectors in quadratic time.
+.br 
+Submitted.
+.SH "BUGS"
+Please contact stral@biophys.uni\-duesseldorf.de

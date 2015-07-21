@@ -1,0 +1,16 @@
+*~
+*.bck
+core
+nohup.out
+.nfs*
+
+log*
+out*
+
+.deps
+.libs
+autom4te.cache
+config.log
+config.status
+Makefile
+

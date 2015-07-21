@@ -1,0 +1,20 @@
+# objects
+*.o
+
+# backup
+*.~
+
+
+# automake
+missing
+install-sh
+depcomp
+config.sub
+config.guess
+compile
+Makefile.in
+INSTALL
+COPYING
+autom4te.cache
+configure
+Makefile
