@@ -21,61 +21,61 @@
 void create_sub_matrix () {
 	int i, j; 		   /*values in {A,C,G,U,N,-} */
 
+	memset (d, 0, sizeof (d));
 
-	if (!submat){
-		memset (d, 0, sizeof (d));
-		if (ribosum){
-			/*	 Substitution matrix according to  				   *
-			 * Klein, R.J. & Eddy, S.R. (2003) BMC Bioinf. 4, 44-59	   *
-			 * RSEARCH: Finding homologs of single structured RNA sequences*/
+	if (ribosum){
+		/*	 Substitution matrix according to  				   *
+		 * Klein, R.J. & Eddy, S.R. (2003) BMC Bioinf. 4, 44-59	   *
+		 * RSEARCH: Finding homologs of single structured RNA sequences*/
 
-			d[0][0] = +2.22;
-			d[0][1] = -1.86;
-			d[0][2] = -1.46;
-			d[0][3] = -1.39;
+		d[0][0] = +2.22;
+		d[0][1] = -1.86;
+		d[0][2] = -1.46;
+		d[0][3] = -1.39;
 
-			d[1][0] = -1.86;
-			d[1][1] = +1.16;
-			d[1][2] = -2.48;
-			d[1][3] = -1.05;
+		d[1][0] = -1.86;
+		d[1][1] = +1.16;
+		d[1][2] = -2.48;
+		d[1][3] = -1.05;
 
-			d[2][0] = -1.46;
-			d[2][1] = -2.48;
-			d[2][2] = +1.03;
-			d[2][3] = -1.74;
+		d[2][0] = -1.46;
+		d[2][1] = -2.48;
+		d[2][2] = +1.03;
+		d[2][3] = -1.74;
 
-			d[3][0] = -1.39;
-			d[3][1] = -1.05;
-			d[3][2] = -1.74;
-			d[3][3] = +1.65;
+		d[3][0] = -1.39;
+		d[3][1] = -1.05;
+		d[3][2] = -1.74;
+		d[3][3] = +1.65;
 		
 
-		} else {
-			/* Substitution matrix according to					    * 
-			 * Gotoh, O. (1999) Adv. Biophys. 36, 159-206.			    *
-			 * Multiple sequence alignment: algorithms and applications     */
+	} else {
+		/* Substitution matrix according to					    * 
+		 * Gotoh, O. (1999) Adv. Biophys. 36, 159-206.			    *
+		 * Multiple sequence alignment: algorithms and applications     */
 
 		
-			d[0][0] = +2;
-			d[0][1] = -2;
-			d[0][2] = -1;
-			d[0][3] = -2;
+		d[0][0] = +2;
+		d[0][1] = -2;
+		d[0][2] = -1;
+		d[0][3] = -2;
 
-			d[1][0] = -2;
-			d[1][1] = +2;
-			d[1][2] = -2;
-			d[1][3] = -1;
+		d[1][0] = -2;
+		d[1][1] = +2;
+		d[1][2] = -2;
+		d[1][3] = -1;
 
-			d[2][0] = -1;
-			d[2][1] = -2;
-			d[2][2] = +2;
-			d[2][3] = -2;
+		d[2][0] = -1;
+		d[2][1] = -2;
+		d[2][2] = +2;
+		d[2][3] = -2;
 
-			d[3][0] = -2;
-			d[3][1] = -1;
-			d[3][2] = -2;
-			d[3][3] = +2;
-		}
+		d[3][0] = -2;
+		d[3][1] = -1;
+		d[3][2] = -2;
+		d[3][3] = +2;
+		
+		
 	}
 
 		
@@ -147,5 +147,4 @@ void createDistanceMatrix(float **array, int n){
 	}
 #endif
 }
-
 	

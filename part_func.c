@@ -7,7 +7,7 @@
 */
 /*
   $Log: part_func.c,v $
-  Revision 1.9  2006-01-20 14:16:39  dalli
+  Revision 1.9  2006/01/20 14:16:39  dalli
   version 0.5.0 für publikation
   bug aus midpoint-method entfernt
   option zur wahl zwischen globalen alignment und alignment ohne termini bewertung
@@ -62,7 +62,7 @@
 
 
 /*@unused@*/
-/* AW: unused static char rcsid[] UNUSED = "$Id: part_func.c,v 1.9 2006-01-20 14:16:39 dalli Exp $"; */
+/* AW: unused static char rcsid[] UNUSED = "$Id: part_func.c,v 1.9 2006/01/20 14:16:39 dalli Exp $"; */
 
 #define MAX1(x,y) (((x)>(y)) ? (x) : (y))
 #define MIN1(x,y) (((x)<(y)) ? (x) : (y))

@@ -1,4 +1,4 @@
-#define _GNU_SOURCE
+#include "config.h"
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -8,13 +8,12 @@
 #include <dirent.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include "mhash.h"
 
 #include "stral.h"
 #include "align.h"
 #include "iofuncs.h"
-#include "create_matrix.h"
+#include "config.h"
 
 
 int pc;
@@ -56,7 +55,7 @@ void print2probfile(struct vector *ptr){
     	
 	fd = open(hashfilename,O_RDWR|O_CREAT|O_TRUNC, S_IRWXU|S_IRWXG|S_IRWXO);
 	j = 0;
-	sprintf(buffer, "%s\n",STRAL_VERSION);
+	sprintf(buffer, "%s\n",VERSION);
 	write(fd,&buffer,strlen(buffer));
 	while(sdata[ptr->seqID].ID[j]!='\0'){ 
 		write(fd,&sdata[ptr->seqID].ID[j],1);
@@ -109,7 +108,7 @@ int readfromprobfile(char *filename, int n){
 		last_ptr[n] = first_ptr[n] = NULL;
 		while(fgets(buffer, 34, fz)){
 			if (count == 0){
-				if (strncmp(buffer,STRAL_VERSION,5)){
+				if (strncmp(buffer,VERSION,5)){
 					printf("version conflict in file %s\n", filename);
 					printf("please remove file from probDIR\n");
 					exit(1);				
@@ -342,14 +341,14 @@ void remgapcols1(int n){
 
 	
 	while(ptrarray[0]!=NULL){
-		int boolean =1;
+		int bool =1;
 		for (i =0; i < n; ++i){
 			if (ptrarray[i]->replbase!=5){
-					boolean = 0;
+					bool = 0;
 					i = n;
 			}
 		}
-		if (boolean){
+		if (bool){
 			for (i=0; i < n; ++i){
 				if (ptrarray[i]==last_ptr[i]){
 					last_ptr[i] = last_ptr[i]->previous_ptr;
@@ -473,7 +472,7 @@ void parsenewicktree(int nseqs){
 int recursion(int begin,char **nwtree,int count,int rn, int ***array,int p){
 	int i;
 	int n;
-	int boolean=1;
+	int bool=1;
 	int cast1, cast2;
 
 	
@@ -485,12 +484,13 @@ int recursion(int begin,char **nwtree,int count,int rn, int ***array,int p){
 				/*printf("***************************************\n                 p is %d               				\n****************************************\n",p);*/
 			}
 			i = recursion(i,nwtree,count,rn+1,array,p)+1;		
-			boolean = 0;
+			bool = 0;
 		}
 		
 		/* case 1 "(x,y)" */
 		
-		if ((strncmp(nwtree[i],")",1)==0) && boolean){
+		if ((strncmp(nwtree[i],")",1)==0) && bool){
+
 			sscanf(nwtree[i-7],"%d",&cast1);
 			sscanf(nwtree[i-3],"%d",&cast2);
 
@@ -647,25 +647,25 @@ int recursion(int begin,char **nwtree,int count,int rn, int ***array,int p){
 
 		}	else if (strncmp(nwtree[i],")",1)==0 && (rn != 0)){
 			int min=prof[pc+1].seqprofB[0];
-			bool myvar2 = false;
+			int bool1 = 0;
 			int m=0;
 
 			
 			cast1=prof[pc+1].seqprofA[0];
 			for (n=pc+2; n <= p; ++n){
 				if (min!=prof[n].seqprofA[0] || min!=prof[n].seqprofB[0]){
-					myvar2 = true;
+					bool1=1;
 				}
-				if (myvar2){
+				if (bool1){
 					cast2=prof[n].seqprofA[0];
 					
 					for (m = pc+1; m <= p; ++m){
 						if (((prof[m].seqprofA[0]==(cast1 < cast2 ? cast1 : cast2)) && (prof[m].seqprofB[0]== (cast1 > cast2 ? cast1 : cast2))) || (cast1==cast2)){
-							myvar2 = false;
+							bool1=0;
 							continue;
 						}
 					}
-					if (myvar2){
+					if (bool1){
 						n=p;
 						continue;
 					}
@@ -771,8 +771,7 @@ int recursion(int begin,char **nwtree,int count,int rn, int ***array,int p){
  *
  * Returns:		void
  */
-
-void printpairwise(int seq1,int seq2, char *seqA, char *seqB, int boolean, char *filename){
+void printpairwise(int seq1,int seq2, char *seqA, char *seqB, int bool, char *filename){
 	int j,fd, len;
 	char c='\n';
 	char b='>';
@@ -781,7 +780,7 @@ void printpairwise(int seq1,int seq2, char *seqA, char *seqB, int boolean, char 
 
 	len = strlen(sdata[seq1].ID)+strlen("-vs-");
 	
-	if (boolean){
+	if (bool){
 		int i;
 		for (len=strlen(filename)-1; len >=0 ; --len){
 		if(filename[len]=='/')
@@ -857,88 +856,4 @@ void printstart2end(int begin, int end, struct vector *start_ptr){
 		start_ptr=start_ptr->previous_ptr;
 	}
 	printf("\n");
-}
-
-void readsubmatrix(char *filename){
-	char buffer[64];
-	char *tab, *space, *newline;
-	int i,j;
-	char *ptr;
-	tab="\t";
-	space=" ";
-	newline="\n";
-	FILE *fz;
-	fprintf(stdout,"%s\n",filename);
-	if ((fz = fopen(filename, "r"))==NULL){
-		fprintf(stdout,"unable to open file for some reason\n");
-		exit(1); 	
-		/*return 0;*/
-	} else {
-		memset (d, 0, sizeof (d));
-		i = 0; 
-		j = 0;
-		while(fgets(buffer, 64, fz)){
-			int len;
-			len = strlen(buffer);
-			ptr = strtok(buffer, "\n\t ");
-			while(ptr != NULL) {
-     			if (i % 4 == 0 && i !=0){
-					j++;
-				}
-				sscanf(ptr,"%f",&d[j][i%4]);
-				printf("% d. Wort: %s\n",i++,ptr);
-				
-				
-				ptr = strtok(NULL, "\n\t ");
-			}
-		}
-	}
-	for (i = 0; i < 4; i++){
-		for (j = 0; j < 4; j++){
-			fprintf(stdout,"d[%d][%d]:%f\n",i,j,d[i][j]);
-		}
-	}
-	
-}	
-
-
-/* Function:		printtreefile
- * 
- * Purpose:		print the clusters to file
- *           
- * Args:			
- *
- * Returns:		void
- */
-void printtreefile(struct profile *prof, int nseqs){
-	int fd, j, i;
-	char buffer[16];
-	char *filename="tree.dat";
-		
-	fd = open(filename,O_RDWR|O_CREAT|O_TRUNC, S_IRWXU|S_IRWXG|S_IRWXO);
-	for (i=nseqs-2; i >=0;--i){
-		sprintf(buffer,"Cycle %d %d %d",i,prof[i].pnoA,prof[i].pnoB);
-		write(fd, &buffer, strlen(buffer));
-		sprintf(buffer,"\n");
-		write(fd, &buffer, strlen(buffer));
-		sprintf(buffer,"SizeA %d",prof[i].nA);
-		write(fd, &buffer, strlen(buffer));
-		for (j = 0; j < prof[i].nA; j++){
-			sprintf(buffer," %d",prof[i].seqprofA[j]);
-			write(fd, &buffer, strlen(buffer));
-		}
-		sprintf(buffer,"\n");
-		write(fd, &buffer, strlen(buffer));
-		sprintf(buffer,"SizeB %d",prof[i].nB);
-		write(fd, &buffer, strlen(buffer));
-		for (j = 0; j < prof[i].nB; j++){
-			sprintf(buffer," %d",prof[i].seqprofB[j]);
-			write(fd, &buffer, strlen(buffer));
-		}
-		sprintf(buffer,"\n");
-		write(fd, &buffer, strlen(buffer));
-	}
-	exit(0);
-	
-	close(fd);
 }

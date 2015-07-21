@@ -65,28 +65,12 @@ float **arrayI;
 float **arrayJ;
 
 
-/* array holding mean z-scores */
-float **zscore;
 
+/* functions */
 void align(int nseqs, char *seqfile);
 void malign(int n);
-
-
 void method(struct vector *first1_ptr, struct vector *last1_ptr, struct vector *first2_ptr, struct vector *last2_ptr, int nseqs, char *seqfile);
-void freegapspw(struct vector *first1_ptr,struct vector *last1_ptr, struct vector *first2_ptr, struct vector *last2_ptr, int nseqs, char *seqfile);
-void calczscore(int n);
-
+float methodmult(struct profile p, int lenA, int lenB, int nseqs, int cp);
+void levelpos(int cluster);
 void print_data_content2(struct vector *current_ptr);
 float **data_content(struct vector *current_ptr, float **arrayX);
-
-
-
-float methodmult(struct profile p, int lenA, int lenB, int nseqs, int cp);
-
-int *terminalprefix(struct profile p, int lenA, int lenB, int nseqs, int cp);
-int *terminalsuffix(struct profile p, int lenA, int lenB, int nseqs, int cp);
-
-
-void levelpos(int cluster);
-
-

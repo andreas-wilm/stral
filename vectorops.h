@@ -2,7 +2,7 @@
  * Header file for vectorops.c
  * 
  * SRE, Tue Oct  1 15:23:37 2002 [St. Louis]
- * CVS $Id: vectorops.h,v 1.1.1.1 2005-06-06 16:00:03 dalli Exp $
+ * CVS $Id: vectorops.h,v 1.1.1.1 2005/06/06 16:00:03 dalli Exp $
  */
 
 extern void   DSet(double *vec, int n, double value);

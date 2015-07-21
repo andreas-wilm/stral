@@ -15,7 +15,7 @@
 #include "stral.h"
 #include "nrutils.h"
 #include "iofuncs.h"
-#include "fft.h"
+
 
 
 
@@ -33,7 +33,6 @@ void align(int nseqs, char *seqfile){
 	mode_t mode = S_IRWXU;
 	array =(float **)malloc(nseqs*sizeof(float *));
 	distmatrix =(float **)malloc(nseqs*sizeof(float *));
-	zscore =(float **)malloc(nseqs*sizeof(float *));
 	if (!nofile){
 		chdir(workingdir);
 		if (opendir("./pairwiseDIR")==NULL){
@@ -45,19 +44,13 @@ void align(int nseqs, char *seqfile){
 
 	for ( i = 0; i < nseqs; ++i){
 		*(array+i) = (float *)malloc(nseqs* sizeof(float)) ;
-		*(zscore+i) = (float *)malloc(nseqs* sizeof(float)) ;
 		*(distmatrix+i) = (float *)malloc(nseqs* sizeof(float)) ;
 		for ( k=i+1; k < nseqs; ++k){
 			
 			
-			if (fft){
-				fftalign(last_ptr[i], last_ptr[k]);
-			}
-			
-			
 			method(first_ptr[i], last_ptr[i], first_ptr[k], last_ptr[k],nseqs, seqfile);
 
-			
+
 #ifdef DEBUG
 			if (!verbose){
 				printf("Aligning seq %d with %d\n", i+1,k+1);
@@ -65,9 +58,6 @@ void align(int nseqs, char *seqfile){
 			}
 #endif			
 		}
-	}
-	if (spread){
-		calczscore(nseqs);
 	}
 }
 
@@ -84,7 +74,6 @@ void malign(int n){
 	int i = 0;
 	int j = 0;
 	int k = 0;
-	
 	int sizeA = 0;
 	int sizeB = 0;
 	struct vector **ptrarray;
@@ -93,7 +82,6 @@ void malign(int n){
 	ct=1;
 	
 	
-
 	/* allocate memory for scoring vectors */
 	fps = (struct lscore **)malloc(n * sizeof(struct lscore *));
 	lps = (struct lscore **)malloc(n * sizeof(struct lscore *));	
@@ -186,9 +174,7 @@ void malign(int n){
 				prof[i].seqprofB[0], prof[i].pnoB);
 		}
 #endif		
-		if (fft){	
-			fftmultalign(prof[i] , sdata[prof[i].seqprofA[0]-1].seqlength , sdata[prof[i].seqprofB[0]-1].seqlength, n);
-		}
+		
 		methodmult(prof[i] , sdata[prof[i].seqprofA[0]-1].seqlength , sdata[prof[i].seqprofB[0]-1].seqlength,n,i);
 	}
 }
@@ -228,36 +214,56 @@ void method(struct vector *first1_ptr, struct vector *last1_ptr, struct vector *
 	char del='-';
 	char *backtrack, *seqB, *seqA; 
 
-	if (noterm){
+	if ((first1_ptr->pos < first2_ptr->pos) && noterm){
+	
+		for (k=1;k<=first1_ptr->pos;++k){	
+			v[k][0]=-k*gapOpen;
+			f[k][0]=-k*gapOpen;
+			e[k][0]=-k*gapOpen;
+			g[k][0]=-k*gapOpen;
+		}
+	
+		for (l=0;l<=first2_ptr->pos;++l){
+			v[0][l]=0;
+			f[0][l]=0;
+			g[0][l]=0;
+			e[0][l]=0;
+		}
+	} else if	((first1_ptr->pos > first2_ptr->pos) && noterm){
+	
+	
 		for (k=0;k<=first1_ptr->pos;++k){	
 			v[k][0]=0;
 			f[k][0]=0;
-			e[k][0]=-gapOpen-k*gapExt;
+			e[k][0]=0;
 			g[k][0]=0;
 		}
-			
+	
+		for (l=1;l<=first2_ptr->pos;++l){
+			v[0][l]=-l*gapOpen;
+			f[0][l]=-l*gapOpen;
+			g[0][l]=-l*gapOpen;
+			e[0][l]=-l*gapOpen;
+		}
+	
+	} else {
+	
+	
+		for (k=0;k<=first1_ptr->pos;++k){	
+			v[k][0]=0;
+			f[k][0]=0;
+			e[k][0]=0;
+			g[k][0]=0;
+		}
+	
 		for (l=0;l<=first2_ptr->pos;++l){
 			v[0][l]=0;
-			f[0][l]=-gapOpen-l*gapExt;
+			f[0][l]=0;
 			g[0][l]=0;
 			e[0][l]=0;
 		}
-	} else {
-		for (k=0;k<=first1_ptr->pos;++k){	
-			v[k][0]=-gapOpen-k*gapExt;
-			f[k][0]=0;
-			e[k][0]=-gapOpen-k*gapExt;
-			g[k][0]=0;
-		}
-			
-		for (l=0;l<=first2_ptr->pos;++l){
-			v[0][l]=-gapOpen-l*gapExt;
-			f[0][l]=-gapOpen-l*gapExt;
-			g[0][l]=0;
-			e[0][l]=0;
-		}
+		
 	}
-	
 	i_ptr=last1_ptr;
 	j_ptr=last2_ptr;
 	
@@ -282,40 +288,6 @@ void method(struct vector *first1_ptr, struct vector *last1_ptr, struct vector *
 		j_ptr=last2_ptr;
 				
 	}
-	
-	/*
-		
-	
-	printf("matrix v\n");
-	for (k=0; k <= first1_ptr->pos; ++k){
-		for (l=0; l <= first2_ptr->pos; ++l){
-			printf("%13.5f ",v[k][l]);
-		}
-		printf("\n");
-	}
-	printf("matrix e\n");
-	for (k=0; k <= first1_ptr->pos; ++k){
-		for (l=0; l <= first2_ptr->pos; ++l){
-			printf("%13.5f ",e[k][l]);
-		}
-		printf("\n");
-	}
-	printf("matrix f\n");
-	for (k=0; k <= first1_ptr->pos; ++k){
-		for (l=0; l <= first2_ptr->pos; ++l){
-			printf("%13.5f ",f[k][l]);
-		}
-		printf("\n");
-	}
-	printf("matrix g\n");
-	for (k=0; k <= first1_ptr->pos; ++k){
-		for (l=0; l <= first2_ptr->pos; ++l){
-			printf("%13.5f ",g[k][l]);
-		}
-		printf("\n");
-	}
-	*/
-	
 	
 	
 	endV = v[k-1][l-1];
@@ -348,11 +320,9 @@ void method(struct vector *first1_ptr, struct vector *last1_ptr, struct vector *
 			maxCol = (maxCol < v[k][j] ? v[k][j] : maxCol);	
 		}
 	}
-	/*
-	printf("maxRow: %f, maxCol %f\n",maxRow, maxCol);
-	*/
 	
-	if (maxRow  > v[k-1][l-1] || maxCol > v[k-1][l-1]){
+	
+	if (maxRow || maxCol > v[k-1][l-1]){
 		if (maxRow > maxCol) {
 			while (maxRow > v[k][l]) {
 			/*fa*/	
@@ -393,14 +363,13 @@ void method(struct vector *first1_ptr, struct vector *last1_ptr, struct vector *
 			}
 		
 		}
-	} 
+	} else {
+		
+	}
 	
 	
 	
-	/*
-	printf("k: %d, l: %d\n", k ,l );
-	printf("%s\n",seqA);
-	printf("%s\n",seqB);*/
+	
 	
 	while (k > 0 && l > 0 && i_ptr!=NULL && j_ptr !=NULL){ /* paranoia test */
 
@@ -410,7 +379,7 @@ void method(struct vector *first1_ptr, struct vector *last1_ptr, struct vector *
 		va = v[k][l];
 		if (va == ga){
 			
-		/*	printf("match, va = %13.5f, ea = %13.5f, fa = %13.5f, ga = %13.5f i: %d, j %d v[k][l]= %13.5f\n",va,ea,fa,ga,k,l,v[k][l]);*/
+	
 					
 			strncat(seqA,&i_ptr->base,1);
 			strncat(seqB,&j_ptr->base,1);
@@ -430,8 +399,7 @@ void method(struct vector *first1_ptr, struct vector *last1_ptr, struct vector *
 			--k;
 			--l;
 		} else if (va==ea) {
-/*			printf("ea gap, va = %13.5f, ea = %13.5f, fa = %13.5f, ga = %13.5f i: %d, j %d v[k][l]= %13.5f,v[k][l-1]= %13.5f \n",va,ea,fa,ga,k,l,v[k][l],v[k][l-1]);*/
-			
+	
 			
 			seqA[strlen(seqA)]=del;
 			seqA[strlen(seqA)+1]='\0';
@@ -446,11 +414,10 @@ void method(struct vector *first1_ptr, struct vector *last1_ptr, struct vector *
 			j_ptr = j_ptr->next_ptr;
 			
 			--l;
-			/*printf("i: %d, j %d\n",k,l);*/
 		} else if (va==fa){
 			
 			
-/*			printf("fa gap, va = %13.5f, ea = %13.5f, fa = %13.5f, ga = %13.5f i: %d, j %d v[k][l]= %13.5f\n",va,ea,fa,ga,k,l,v[k][l]);*/
+
 			
 			seqA[strlen(seqA)]=i_ptr->base;
 			seqA[strlen(seqA)+1]='\0';
@@ -509,9 +476,7 @@ void method(struct vector *first1_ptr, struct vector *last1_ptr, struct vector *
 	    }
     }
 	
-	fprintf(stdout,"aln->length: %d\n",strlen(seqA));
-	zscore[first1_ptr->seqID][first2_ptr->seqID] = v[first1_ptr->pos][first2_ptr->pos]/strlen(seqA);
-	fprintf(stdout,"zscore: %f\n",zscore[first1_ptr->seqID][first2_ptr->seqID]);
+	
 	
 #ifdef DEBUG	
 	if (!verbose){
@@ -573,7 +538,6 @@ void method(struct vector *first1_ptr, struct vector *last1_ptr, struct vector *
  */
 float methodmult(struct profile p, int lenA, int lenB, int nseqs, int cp){
 	int i,j,k,m,n;
-	int numseq;
 	struct vector **ptrarrayA;
 	struct vector **ptrarrayB;
 	struct lscore *lptr, *spA, *spB;
@@ -598,7 +562,6 @@ float methodmult(struct profile p, int lenA, int lenB, int nseqs, int cp){
 	ptrarrayB = (struct vector **)malloc(p.nB*sizeof(struct vector *));
 	
 	
-	numseq = (p.nA+p.nB) * (p.nA+p.nB-1) / 2;
 		
 	scorematrix=(float **)malloc((lenA+1)*sizeof(float *));
 	
@@ -646,37 +609,54 @@ float methodmult(struct profile p, int lenA, int lenB, int nseqs, int cp){
 	}
 
 
-
-	if (noterm) {
+	if ((lenA < lenB) && noterm){
+		for (i=1;i<=lenA;++i){	
+			v[i][0]=-i*gapOpenM;
+			f[i][0]=-i*gapOpenM;
+			e[i][0]=-i*gapOpenM;
+			g[i][0]=-i*gapOpenM;
+		}
+	
+		for (j=0;j<=lenB;++j){
+			v[0][j]=0;
+			f[0][j]=0;
+			g[0][j]=0;
+			e[0][j]=0;
+		}
+	} else if	((lenA > lenB) && noterm) {
 		for (i=0;i<=lenA;++i){	
 			v[i][0]=0;
 			f[i][0]=0;
-			e[i][0]=(-gapOpenM-i*gapExtM)*numseq;
+			e[i][0]=0;
 			g[i][0]=0;
 		}
 	
 		for (j=1;j<=lenB;++j){
-			v[0][j]=0;
-			f[0][j]=(-gapOpenM-j*gapExtM)*numseq;
-			e[0][j]=0;
-			g[0][j]=0;
+			v[0][j]=-j*gapOpenM;
+			f[0][j]=-j*gapOpenM;
+			e[0][j]=-j*gapOpenM;
+			g[0][j]=-j*gapOpenM;
 		}
 	
 	} else {
 		for (i=0;i<=lenA;++i){	
-			v[i][0]=(-gapOpenM-i*gapExtM)*numseq;
+			v[i][0]=0;
 			f[i][0]=0;
-			e[i][0]=(-gapOpenM-i*gapExtM)*numseq;
+			e[i][0]=0;
 			g[i][0]=0;
 		}
-	
+		
 		for (j=1;j<=lenB;++j){
-			v[0][j]=(-gapOpenM-j*gapExtM)*numseq;
-			f[0][j]=(-gapOpenM-j*gapExtM)*numseq;
+			v[0][j]=0;
+			f[0][j]=0;
 			g[0][j]=0;
 			e[0][j]=0;
 		}		
 	}
+	
+
+	
+
 	
 	
 	i=1;
@@ -728,47 +708,7 @@ float methodmult(struct profile p, int lenA, int lenB, int nseqs, int cp){
 	
 	
 	
-#ifdef DEBUG	
-	if (!verbose) {
-		printf ("maxV = %f\n",v[lenA][lenB]);
-/*	
-	printf("matrix v\n");
-	for (i=0; i <= lenA; ++i){
-		for (j=0; j <= lenB; ++j){
-			printf("%13.5f ",v[i][j]);
-		}
-		printf("\n");
-	}
-	
 
-	printf("matrix e\n");
-	for (i=0; i <= lenA; ++i){
-		for (j=0; j <= lenB; ++j){
-			printf("%13.5f ",e[i][j]);
-		}
-		printf("\n");
-	}
-
-	
-	printf("matrix f\n");
-	for (i=0; i <= lenA; ++i){
-		for (j=0; j <= lenB; ++j){
-			printf("%13.5f ",f[i][j]);
-		}
-		printf("\n");
-	}
-
-
-	printf("matrix g\n");
-	for (i=0; i <= lenA; ++i){
-		for (j=0; j <= lenB; ++j){
-			printf("%13.5f ",g[i][j]);
-		}
-		printf("\n");
-	}*/
-}
-	
-#endif
 	
 	backtrack = (char*)calloc(1024,sizeof(char));
 		
@@ -798,11 +738,8 @@ float methodmult(struct profile p, int lenA, int lenB, int nseqs, int cp){
 		maxCol = (maxCol < v[i][k] ? v[i][k] : maxCol);	
 	}
 	
-	/*
-	printf("maxRow: %f, maxCol %f\n",maxRow, maxCol);
-	*/
 	}
-	if (maxRow > v[i-1][j-1] || maxCol > v[i-1][j-1]){
+	if (maxRow || maxCol > v[i-1][j-1]){
 		if (maxRow > maxCol) {
 			while (maxRow > v[i][j]) {
 			/*fa*/	
@@ -1297,7 +1234,6 @@ float methodmult(struct profile p, int lenA, int lenB, int nseqs, int cp){
 #endif	
 	if(!nofile){
 		if( (p.nA + p.nB) == nseqs){
-			msascore= v[lenA][lenB];
 			printf("\nScore is:\n");
 			printf("%f\n", v[lenA][lenB]);
 		}
@@ -1406,66 +1342,4 @@ float **data_content(struct vector *current_ptr, float **arrayX){
 
 
 
-void calczscore(int n){
-	float meanscore;	/* Mittelwert */
-	float zmin,zmax,ztmp;
-	float *zi;
-	int combine;	/* Anzahl der Stichproben */
-	float sdsquare;	/* Standardabeweichung ^2 */
-	float sdeviation;	/* Standardabweichung */
-	/* zscore ist der beobachtete Wert der Zufallsvariablen */
-	int i, j;
-	int boolean  = 0;
-	zmin = 10.e6;
-	zmax = -10.e6;
-	zi = (float *)malloc(n*sizeof(float));
-	combine = (n * (n -1)) / 2;
-	for (i = 0; i < n-1; i++){
-		for (j = i + 1; j < n; j++){
-			meanscore += zscore[i][j];
-		}
-	}
-	meanscore /=combine;
-	fprintf(stdout, "Mean Score: %f\n", meanscore);
 
-	for (i = 0; i < n-1; i++){
-		for (j = i + 1; j < n; j++){
-			sdsquare += pow((zscore[i][j]-meanscore),2);
-		}
-	}
-	sdeviation = sqrt(sdsquare/combine);
-	fprintf(stdout, "Standard deviation^2: %f\n", sdsquare);
-	fprintf(stdout, "Standard deviation: %f\n", sdeviation);
-	
-	for (i = 0; i < n-1; i++){
-		for (j = i + 1; j < n; j++){
-			ztmp = (zscore[i][j]-meanscore)/sdeviation;
-			fprintf(stdout, "Z[%d][%d]: %f\n",i,j,ztmp);
-			zmin = (zmin < ztmp ? zmin : ztmp);
-			zmax = (zmax > ztmp ? zmax : ztmp);
-		}
-	}
-
-	fprintf(stdout, "Zmax: %f\n", zmax);
-	fprintf(stdout, "Zmin: %f\n", zmin);
-	
-	for (i = 0; i < n; i++){
-		for (j = 0; j < n; j++){
-			if (i < j){
-				zi[i] += (zscore[i][j]-meanscore)/sdeviation;
-			} else if (j < i) {
-				zi[i] += (zscore[j][i]-meanscore)/sdeviation;
-			}
-		}
-		zi[i] = zi[i]/( n-1);
-		/* ??? is a z-value of one a proper value ??? */
-		if (zi[i] < -1 || zi	[i] > 1){
-			fprintf(stdout, "Scores for sequence # %d (%s) deviate: Avg. z-value is %f\n", i+1,  sdata[i].ID, zi[i]);
-			boolean = 1;
-		}
-	}
-	if (boolean){
-		fprintf(stdout, "Some sequences do not seem to fit to the others. Think of removing them. Calculation stops here!\n");
-		exit(1);
-	}
-}

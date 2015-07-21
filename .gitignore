@@ -20,4 +20,6 @@ config.log
 config.status
 ltmain.sh
 config.cache
-acconfig.h
+acconfig.haclocal.m4
+config.h.in
+aclocal.m4

@@ -364,71 +364,10 @@ void scorePP(struct vector **ptrarrayA,struct vector **ptrarrayB,struct profile 
 
 }
 
-/* Function:		scorePPfft
+
+/* Function:		scorePP
  * 
  * Purpose:		calculate score in msa
- *           
- * Args:			ptrarrayA, ptrarrayB: array of pointers to the vectors of residue i in sequence s in group g
- *				a, b: number of sequences in one group(array)
- *				scorematrix: 2D array storing all calculated scores
- *
- * Returns:		void
- */
-float scorePPfft(struct vector **ptrarrayA,struct vector **ptrarrayB,int a, int b ){
-	float value=0.;
-	int k,l;
-	struct vector *i_ptr, *j_ptr;
-	float weight=1;
-	
-	
-	for (k = 0; k < a ; ++k){	
-		for (l = 0; l < b; ++l){
-			
-			i_ptr = ptrarrayA[k];
-			j_ptr = ptrarrayB[l];		
-			if (a == 1 && b == 1) {
-				weight =sdata[i_ptr->seqID].weight*sdata[j_ptr->seqID].weight;
-			}
-			value = value + weight * (d[i_ptr->replbase][j_ptr->replbase] + alpha * (sqrt(i_ptr->p1 * j_ptr->p1))+ alpha * (sqrt(i_ptr->p2 * j_ptr->p2)));
-		}						
-	}
-	
-	for (k = 0; k < a ; ++k){
-		for (l = k + 1; l < a; ++l){
-				
-			i_ptr = ptrarrayA[k];
-			j_ptr = ptrarrayA[l];			
-			
-			if (a == 1 && b == 1) {
-				weight =sdata[i_ptr->seqID].weight*sdata[j_ptr->seqID].weight;
-			}
-			
-				
-			value = value + weight * (d[i_ptr->replbase][j_ptr->replbase] + alpha * (sqrt(i_ptr->p1 * j_ptr->p1)) + alpha * (sqrt(i_ptr->p2 * j_ptr->p2)));
-		
-		}
-	}	
-	
-	for (k = 0; k < b ; ++k){
-		for (l = k + 1; l < b; ++l){
-		
-			i_ptr = ptrarrayB[k];
-			j_ptr = ptrarrayB[l];	
-						
-							
-			if (a == 1 && b == 1) {
-				weight =sdata[i_ptr->seqID].weight*sdata[j_ptr->seqID].weight;
-			}
-		
-			value = value + weight * ( d[i_ptr->replbase][j_ptr->replbase]  + alpha * (sqrt(i_ptr->p1 * j_ptr->p1))	 + alpha * (sqrt(i_ptr->p2 * j_ptr->p2))); 
-		}
-	}
-	return value;
-}
-
-/* Function:		scorePPcpy
- * 
- * Purpose:		calculate score in msa (using copied vectors)
  *           
  * Args:			ptrarrayA, ptrarrayB: array of pointers to the vectors of residue i in sequence s in group g
  *				a, b: number of sequences in one group(array)
@@ -452,7 +391,7 @@ void scorePPcpy(struct vector **ptrarrayA,struct vector **ptrarrayB,struct profi
 			if (p.nA == 1 && p.nB == 1) {
 				weight =sdata[i_ptr->seqID].weight*sdata[j_ptr->seqID].weight;
 			}
-			/*fprintf(stdout,"d[%d][%d],d[%c][%c],d[%d][%d]\n",	i_ptr->pos, j_ptr->pos,i_ptr->base,j_ptr->base,i_ptr->seqID,j_ptr->seqID);*/
+			fprintf(stdout,"d[%d][%d],d[%c][%c],d[%d][%d]\n",	i_ptr->pos, j_ptr->pos,i_ptr->base,j_ptr->base,i_ptr->seqID,j_ptr->seqID);
 			value = value + weight * (d[i_ptr->replbase][j_ptr->replbase] + alpha * (sqrt(i_ptr->p1 * j_ptr->p1))+ alpha * (sqrt(i_ptr->p2 * j_ptr->p2)));
 		}						
 	}
@@ -541,7 +480,7 @@ float scoreSP(struct vector **ptrarray,int spp){
 struct blocks phelix(int spp){
 	int alen,i,l,k=0;
 	float *H,threshold;
-	int *L,*R,*M,boolean=0;
+	int *L,*R,*M,bool=0;
 	struct blocks blhel;
 	/*struct lscore *lptr;*/
 	
@@ -574,21 +513,21 @@ struct blocks phelix(int spp){
 			/*printf("Anfang\n");*/
 			H[i-1]=0;
 			L[k]=i;
-			boolean = 1;
+			bool = 1;
 		}
 		/*fprintf(stdout,"H[%2d] %8.2f %8.2f\n",i,H[i],H[i-1]);*/
 		if (H[i] < threshold){
 			/*printf("%d-4=%d > L[%d]= %d\n",i,i-4,k,L[k]);*/
-			if (boolean && i-4 > L[k]){
+			if (bool && i-4 > L[k]){
 				R = (int *)realloc(R,(k+2)*(sizeof (int)));
 				M = (int *)realloc(M,(k+2)*(sizeof (int)));			
 				R[k]=i-1;						
 				M[k]=(R[k]+L[k])/2;
-				boolean=0;
+				bool=0;
 				++k;
 				/*printf("Ende\n");*/
 			}	
-			boolean=0;
+			bool=0;
 			H[i]=0;
 		}
 		for (l = 0; l < spp;++l ){
@@ -609,8 +548,7 @@ struct blocks phelix(int spp){
 struct blocks findsegment(int spp){
 	int alen,i,l,k=0;
 	float *H,threshold;
-	int *L,*R,*M,boolean=0;
-
+	int *L,*R,*M,bool=0;
 	struct blocks blseg;
 	struct vector **ptrarray;
 	ptrarray = (struct vector **)malloc(spp*sizeof(struct vector *));
@@ -638,20 +576,20 @@ struct blocks findsegment(int spp){
 			/*printf("Anfang\n");*/
 			H[i-1]=0;
 			L[k]=i;
-			boolean = 1;
+			bool = 1;
 		}
 		/*fprintf(stdout,"H[%d] %f %f\n",i,H[i],H[i-1]);*/
 		if (H[i] < threshold){
-			if (boolean && ((i-4) > L[k])){
+			if (bool && ((i-4) > L[k])){
 				R = (int *)realloc(R,(k+2)*(sizeof (int)));
 				M = (int *)realloc(M,(k+2)*(sizeof (int)));							
 				R[k]=i-1;
 				M[k]=(R[k]+L[k])/2;						
-				boolean=0;
+				bool=0;
 				++k;
 				/*printf("Ende\n");*/
 			}
-			boolean=0;
+			bool=0;
 			H[i]=0;
 		}
 		for (l = 0; l < spp;++l ){
