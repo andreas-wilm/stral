@@ -11,6 +11,9 @@ http://www.biophys.uni-duesseldorf.de/stral/
 
 # Compilation
 
+StrAl requires squid library 1.9g and the mhash library to be installed
+beforehand.
+
 After a first checkout you will need to setup automake once:
 
     $ ./reconf
