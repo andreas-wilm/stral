@@ -2,7 +2,7 @@
 *.o
 
 # backup
-*.~
+*~
 
 
 # automake
@@ -13,8 +13,11 @@ config.sub
 config.guess
 compile
 Makefile.in
-INSTALL
-COPYING
 autom4te.cache
 configure
 Makefile
+config.log
+config.status
+ltmain.sh
+config.cache
+acconfig.h
