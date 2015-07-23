@@ -207,7 +207,7 @@ void method(struct vector *first1_ptr, struct vector *last1_ptr, struct vector *
 	float e[first1_ptr->pos+1][first2_ptr->pos+1];
 	float g[first1_ptr->pos+1][first2_ptr->pos+1];
 	float endV, va, fa, ea, ga, maxxV = 0;
-	int k, l, num, m, n, i, j;
+	int k, l, num = 0, m, n, i, j;
 
 	
 	float diff, old,maxRow,maxCol, sum=0;

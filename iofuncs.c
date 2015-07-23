@@ -341,14 +341,14 @@ void remgapcols1(int n){
 
 	
 	while(ptrarray[0]!=NULL){
-		int bool =1;
+		int flag =1;
 		for (i =0; i < n; ++i){
 			if (ptrarray[i]->replbase!=5){
-					bool = 0;
+					flag = 0;
 					i = n;
 			}
 		}
-		if (bool){
+		if (flag){
 			for (i=0; i < n; ++i){
 				if (ptrarray[i]==last_ptr[i]){
 					last_ptr[i] = last_ptr[i]->previous_ptr;
@@ -472,7 +472,7 @@ void parsenewicktree(int nseqs){
 int recursion(int begin,char **nwtree,int count,int rn, int ***array,int p){
 	int i;
 	int n;
-	int bool=1;
+	int flag=1;
 	int cast1, cast2;
 
 	
@@ -484,12 +484,12 @@ int recursion(int begin,char **nwtree,int count,int rn, int ***array,int p){
 				/*printf("***************************************\n                 p is %d               				\n****************************************\n",p);*/
 			}
 			i = recursion(i,nwtree,count,rn+1,array,p)+1;		
-			bool = 0;
+			flag = 0;
 		}
 		
 		/* case 1 "(x,y)" */
 		
-		if ((strncmp(nwtree[i],")",1)==0) && bool){
+		if ((strncmp(nwtree[i],")",1)==0) && flag){
 
 			sscanf(nwtree[i-7],"%d",&cast1);
 			sscanf(nwtree[i-3],"%d",&cast2);
@@ -647,25 +647,25 @@ int recursion(int begin,char **nwtree,int count,int rn, int ***array,int p){
 
 		}	else if (strncmp(nwtree[i],")",1)==0 && (rn != 0)){
 			int min=prof[pc+1].seqprofB[0];
-			int bool1 = 0;
+			int flag1 = 0;
 			int m=0;
 
 			
 			cast1=prof[pc+1].seqprofA[0];
 			for (n=pc+2; n <= p; ++n){
 				if (min!=prof[n].seqprofA[0] || min!=prof[n].seqprofB[0]){
-					bool1=1;
+					flag1=1;
 				}
-				if (bool1){
+				if (flag1){
 					cast2=prof[n].seqprofA[0];
 					
 					for (m = pc+1; m <= p; ++m){
 						if (((prof[m].seqprofA[0]==(cast1 < cast2 ? cast1 : cast2)) && (prof[m].seqprofB[0]== (cast1 > cast2 ? cast1 : cast2))) || (cast1==cast2)){
-							bool1=0;
+							flag1=0;
 							continue;
 						}
 					}
-					if (bool1){
+					if (flag1){
 						n=p;
 						continue;
 					}
@@ -771,7 +771,7 @@ int recursion(int begin,char **nwtree,int count,int rn, int ***array,int p){
  *
  * Returns:		void
  */
-void printpairwise(int seq1,int seq2, char *seqA, char *seqB, int bool, char *filename){
+void printpairwise(int seq1,int seq2, char *seqA, char *seqB, int flag, char *filename){
 	int j,fd, len;
 	char c='\n';
 	char b='>';
@@ -780,7 +780,7 @@ void printpairwise(int seq1,int seq2, char *seqA, char *seqB, int bool, char *fi
 
 	len = strlen(sdata[seq1].ID)+strlen("-vs-");
 	
-	if (bool){
+	if (flag){
 		int i;
 		for (len=strlen(filename)-1; len >=0 ; --len){
 		if(filename[len]=='/')

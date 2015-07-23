@@ -23,3 +23,8 @@ config.cache
 acconfig.haclocal.m4
 config.h.in
 aclocal.m4
+.deps/
+libtool
+probDIR/
+stamp-h1
+stral

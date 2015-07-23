@@ -53,9 +53,9 @@
 #include <math.h>
 #include <float.h>    /* #defines FLT_MAX ... */
 #include "utils.h"
-#include "energy_par.h"
-#include "fold_vars.h"
-#include "pair_mat.h"
+#include "ViennaRNA/energy_par.h"
+#include "ViennaRNA/fold_vars.h"
+#include "ViennaRNA/pair_mat.h"
 
 #include "stral.h"
 #include "align.h"

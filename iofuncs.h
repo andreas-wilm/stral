@@ -8,6 +8,6 @@ char *remgaps(char *seq, int len);
 void remgapcols1(int n);
 int recursion(int begin,char **nwtree, int count, int rn, int ***array, int p);
 void parsenewicktree(int nseqs);
-void printpairwise(int seq1,int seq2, char *seqA, char *seqB, int bool, char *filename);
+void printpairwise(int seq1,int seq2, char *seqA, char *seqB, int flag, char *filename);
 void print2stdout(int nseqs);
 void printstart2end(int begin, int end, struct vector *start_ptr);

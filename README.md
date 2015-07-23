@@ -1,24 +1,41 @@
-# StrAl
-
+# StrAl: progressive alignment of non-coding RNA using base pairing probability vectors in quadratic time.
 
 See [Dalli et al. (2006)](http://www.ncbi.nlm.nih.gov/pubmed/16613908) for more info
 
-This is a copy of StrAl taken from the SVN server  to make
-sure the code survives. The original code used to
-be available at
+This is a near exact copy of StrAl 0.5.4 to make sure the code survives and is
+compileable. The original is / used to be available at
 http://www.biophys.uni-duesseldorf.de/stral/
+
+Differences from the original 0.5.4:
+- All precompiled libraries removed
+- libweighbor only used if found at configure time
 
 
 # Compilation
 
-StrAl requires squid library 1.9g and the mhash library to be installed
-beforehand.
+## Requirements:
 
-After a first checkout you will need to setup automake once:
+StrAl requires ViennaRNA (version 1.8; not 2!), squid library 1.9g and
+the mhash library to be installed beforehand. You can find copies of
+versions which are know to work in the third-party folder.
+
+If you installed those libraries non-standard directories pass them to
+configure by modifying LDFLAGS and CFLAGS on the commandline.
+
+Notes on ViennaRNA: On OsX, if you get "ld: symbol(s) not found for
+architecture x86_64" while compiling/installing ViennaRNA try a newer
+GCC (setting CC to gcc-mp-4.8 worked for me) or experiment with
+ARCHFLAGS="-arch x86_64" and --disable-openmp as options to configure.
+The stick to the same GCC version for the rest and don't use clang.
+
+
+## After a first checkout
+
+You will need to setup automake once:
 
     $ ./reconf
 
-and possibly
+and possibly (e.g. if ltmain.sh is not found):
 
     $ [g]libtoolize
 
@@ -26,28 +43,11 @@ followed again by
 
 $ ./reconf
 
-After that you can just use:
+After that you can start to GNU triple jump
+
+## Compile and install
 
     $ ./configure
     $ make
     $ make install
 
-# Welcome to StrAl.
-
-StrAl is free software. Please see the file COPYING for details.
-For documentation, please see the files in the doc subdirectory.
-For building and installation instructions please see the INSTALL file.
-
-For generic installation instructions se the file INSTALL.
-
-The homepage of StrAl is
-http://www.biophys.uni-duesseldorf.de/stral/
-
-You will find the sources for download.
-In the future we also plan to provide a webservice.
-
-Contact, questions, bug reports:
-    Gerhard Steger <steger@biophys.uni-duesseldorf.de>,
-    Deniz Dalli <dalli@biophys.uni-duesseldorf.de>,
-    or
-    stral@biophys.uni-duesseldorf.de

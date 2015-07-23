@@ -480,7 +480,7 @@ float scoreSP(struct vector **ptrarray,int spp){
 struct blocks phelix(int spp){
 	int alen,i,l,k=0;
 	float *H,threshold;
-	int *L,*R,*M,bool=0;
+	int *L,*R,*M,flag=0;
 	struct blocks blhel;
 	/*struct lscore *lptr;*/
 	
@@ -513,21 +513,21 @@ struct blocks phelix(int spp){
 			/*printf("Anfang\n");*/
 			H[i-1]=0;
 			L[k]=i;
-			bool = 1;
+			flag = 1;
 		}
 		/*fprintf(stdout,"H[%2d] %8.2f %8.2f\n",i,H[i],H[i-1]);*/
 		if (H[i] < threshold){
 			/*printf("%d-4=%d > L[%d]= %d\n",i,i-4,k,L[k]);*/
-			if (bool && i-4 > L[k]){
+			if (flag && i-4 > L[k]){
 				R = (int *)realloc(R,(k+2)*(sizeof (int)));
 				M = (int *)realloc(M,(k+2)*(sizeof (int)));			
 				R[k]=i-1;						
 				M[k]=(R[k]+L[k])/2;
-				bool=0;
+				flag=0;
 				++k;
 				/*printf("Ende\n");*/
 			}	
-			bool=0;
+			flag=0;
 			H[i]=0;
 		}
 		for (l = 0; l < spp;++l ){
@@ -548,7 +548,7 @@ struct blocks phelix(int spp){
 struct blocks findsegment(int spp){
 	int alen,i,l,k=0;
 	float *H,threshold;
-	int *L,*R,*M,bool=0;
+	int *L,*R,*M,flag=0;
 	struct blocks blseg;
 	struct vector **ptrarray;
 	ptrarray = (struct vector **)malloc(spp*sizeof(struct vector *));
@@ -576,20 +576,20 @@ struct blocks findsegment(int spp){
 			/*printf("Anfang\n");*/
 			H[i-1]=0;
 			L[k]=i;
-			bool = 1;
+			flag = 1;
 		}
 		/*fprintf(stdout,"H[%d] %f %f\n",i,H[i],H[i-1]);*/
 		if (H[i] < threshold){
-			if (bool && ((i-4) > L[k])){
+			if (flag && ((i-4) > L[k])){
 				R = (int *)realloc(R,(k+2)*(sizeof (int)));
 				M = (int *)realloc(M,(k+2)*(sizeof (int)));							
 				R[k]=i-1;
 				M[k]=(R[k]+L[k])/2;						
-				bool=0;
+				flag=0;
 				++k;
 				/*printf("Ende\n");*/
 			}
-			bool=0;
+			flag=0;
 			H[i]=0;
 		}
 		for (l = 0; l < spp;++l ){

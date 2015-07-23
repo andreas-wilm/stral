@@ -3,22 +3,23 @@
 # Process this file with autoconf to produce a configure script.
 
 # Autoconf-Manual, p. 15
-AC_INIT(stral.c)
+# http://www.gnu.org/software/automake/manual/automake.html#Modernize-AM_005fINIT_005fAUTOMAKE-invocation
+AC_INIT([stral], [0.5.5])
+PACKAGE=stral
+MAJOR_VERSION=0
+MINOR_VERSION=5
+PATCHLEVEL=5
+
 # Autoconf-Manual, p. 16
 AC_CONFIG_SRCDIR(config.h.in)
 AM_CONFIG_HEADER(config.h)
 #
 
 # Version changes must also be applied below !
-AM_INIT_AUTOMAKE(stral, 0.5.4)
-PACKAGE=stral
-MAJOR_VERSION=0
-MINOR_VERSION=5
-PATCHLEVEL=4
+AM_INIT_AUTOMAKE([foreign])
 #
 VERSION=${MAJOR_VERSION}.${MINOR_VERSION}.${PATCHLEVEL}
 NODOT_VERSION=${MAJOR_VERSION}_${MINOR_VERSION}_${PATCHLEVEL}
-#
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 AC_SUBST(NODOT_VERSION)
@@ -50,18 +51,18 @@ AM_PROG_LIBTOOL
 #------------------      LIBRARIES / EXT PROGRAMS  ----------------------------
 #------------------------------------------------------------------------------
 # Autoconf-Manual, p. 38
-LIBS="-L."
 
 # math-check
 AC_CHECK_LIB(m, exp,, AC_MSG_ERROR("Could not find libm."))
 
-# CAUTION: This checks for libs in local directory plus in $LIB_PATH
-# lib from Vienna package
-AC_CHECK_LIB(RNA, pf_fold, , AC_MSG_ERROR("Could not find libRNA (Vienna)."), -L. -lm)
+AC_CHECK_HEADERS([ViennaRNA/part_func.h], ,
+   AC_MSG_WARN(" *** Couldn't find ViennaRNA headers! 
+   Please install from http://www.tbi.univie.ac.at/RNA/ (or see third-party folder) ***"))
+AC_CHECK_LIB(RNA, pf_fold, , AC_MSG_ERROR("Could not find libRNA (ViennaRNA)."), -lm)
 
 
 # weighbor
-AC_CHECK_LIB(weighbor, weighbor, , AC_MSG_ERROR("Could not find libweighbor."), -L. -lm)
+AC_CHECK_LIB(weighbor, weighbor, , AC_MSG_WARN("Could not find libweighbor."), -lm)
 
 
 #------------------------------------------------------------------------------
@@ -80,21 +81,22 @@ AC_HEADER_DIRENT
 # Autoconf-Manual, p. 51
 AC_HEADER_STDC
 # Autoconf-Manual, p. 53
-AC_CHECK_HEADERS([fcntl.h float.h limits.h stddef.h stdlib.h string.h strings.h unistd.h squid.h])
+AC_CHECK_HEADERS([fcntl.h float.h limits.h stddef.h stdlib.h string.h strings.h unistd.h])
 
 
 ###  squid
 #
-AC_CHECK_HEADERS([squid.h],,
-   AC_MSG_WARN(" *** Couldn't find squid headers! Will use local header and library ***"); LIBS="${LIBS} -L. -Lsquid_precomp"; CFLAGS="${CFLAGS} -I./squid_precomp")
-AC_CHECK_LIB(squid, MSAFileOpen,,
-   AC_MSG_ERROR("Could not find libsquid."), -L. -lm)
+AC_CHECK_HEADERS([squid.h], ,
+   AC_MSG_WARN(" *** Couldn't find squid headers! 
+   Please install from http://selab.janelia.org/software.html (or see third-party folder) ***"))
+AC_CHECK_LIB(squid, MSAFileOpen, , AC_MSG_ERROR("Could not find libsquid."), -lm)
 
 ### mhash
 #
-AC_CHECK_HEADERS([mhash.h],,
-   AC_MSG_WARN(" *** Couldn't find mhash header! Will use local header and library ***"); LIBS="${LIBS} -L. -Lmhash_precomp"; CFLAGS="${CFLAGS} -I./mhash_precomp")
-AC_CHECK_LIB(mhash, mhash_init, , AC_MSG_ERROR("Could not find libmhash."), -L.)
+AC_CHECK_HEADERS([mhash.h], ,
+   AC_MSG_WARN(" *** Couldn't find mhash header! 
+   Please install from http://mhash.sourceforge.net/ (or see third-party folder) ***"))
+AC_CHECK_LIB(mhash, mhash_init, , AC_MSG_ERROR("Could not find libmhash."), )
 
 #------------------------------------------------------------------------------
 #------- Checks for typedefs, structures, and compiler characteristics --------
