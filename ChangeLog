@@ -1,0 +1,8 @@
+* 0.5.5
+
+- libweighbor only used if found at configure time.
+- made sure compiles against ViennaRNA-1.8.5
+- cleared some clutter
+- precompiled libraries removed
+
+Andreas Wilm

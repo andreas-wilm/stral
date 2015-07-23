@@ -17,21 +17,20 @@ Differences from the original 0.5.4:
 
 StrAl requires ViennaRNA (version 1.8; not 2!), squid library 1.9g and
 the mhash library to be installed beforehand. You can find copies of
-versions which are know to work in the third-party folder.
+versions which are known to work in the third-party folder.
 
-If you installed those libraries non-standard directories pass them to
-configure by modifying LDFLAGS and CFLAGS on the commandline.
+If you install these libraries to non-standard directories let configure
+know by modifying LDFLAGS and CFLAGS on the commandline.
 
-Notes on ViennaRNA: On OsX, if you get "ld: symbol(s) not found for
-architecture x86_64" while compiling/installing ViennaRNA try a newer
+Notes on ViennaRNA: On OsX, if you get `"ld: symbol(s) not found for
+architecture x86_64"` while compiling/installing ViennaRNA try a newer
 GCC (setting CC to gcc-mp-4.8 worked for me) or experiment with
-ARCHFLAGS="-arch x86_64" and --disable-openmp as options to configure.
-The stick to the same GCC version for the rest and don't use clang.
+`ARCHFLAGS="-arch x86_64"` and `--disable-openmp` as options to configure.
 
 
-## After a first checkout
+## First checkout
 
-You will need to setup automake once:
+After a first checkout you will need to setup automake once:
 
     $ ./reconf
 
@@ -41,9 +40,9 @@ and possibly (e.g. if ltmain.sh is not found):
 
 followed again by 
 
-$ ./reconf
+    $ ./reconf
 
-After that you can start to GNU triple jump
+After that you can start to GNU triple jump:
 
 ## Compile and install
 
