@@ -34,7 +34,11 @@ After a first checkout you will need to setup automake once:
 
     $ ./reconf
 
-and possibly (e.g. if ltmain.sh is not found):
+and possibly (if reconf complains accordingly) followed by:
+
+    $ automake --add-missing
+
+and also (if ltmain.sh is not found):
 
     $ [g]libtoolize
 
@@ -42,7 +46,8 @@ followed again by
 
     $ ./reconf
 
-After that you can start to GNU triple jump:
+After that configure and Makefile.in's will have been generated and
+you can do the GNU triple jump:
 
 ## Compile and install
 
