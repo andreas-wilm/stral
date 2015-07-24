@@ -25,6 +25,12 @@ config.h.in
 aclocal.m4
 .deps/
 libtool
-probDIR/
+config.h
 stamp-h1
+
+probDIR/
+results/
+resultDIR/
+bp-probs/
+
 stral

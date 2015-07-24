@@ -76,7 +76,7 @@ void malign(int n){
 	int k = 0;
 	int sizeA = 0;
 	int sizeB = 0;
-	struct vector **ptrarray;
+	/*struct vector **ptrarray;*/
 	
 	
 	ct=1;
@@ -85,7 +85,7 @@ void malign(int n){
 	/* allocate memory for scoring vectors */
 	fps = (struct lscore **)malloc(n * sizeof(struct lscore *));
 	lps = (struct lscore **)malloc(n * sizeof(struct lscore *));	
-	ptrarray = (struct vector **)malloc(n*sizeof(struct vector *));
+	/*ptrarray = (struct vector **)malloc(n*sizeof(struct vector *));*/
 	
 	
 	for (k = 0; k < n ; ++k){
@@ -206,7 +206,8 @@ void method(struct vector *first1_ptr, struct vector *last1_ptr, struct vector *
 	float f[first1_ptr->pos+1][first2_ptr->pos+1];
 	float e[first1_ptr->pos+1][first2_ptr->pos+1];
 	float g[first1_ptr->pos+1][first2_ptr->pos+1];
-	float endV, va, fa, ea, ga, maxxV = 0;
+	/*float endV;*/
+    float va, fa, ea, ga, maxxV = 0;
 	int k, l, num = 0, m, n, i, j;
 
 	
@@ -290,7 +291,7 @@ void method(struct vector *first1_ptr, struct vector *last1_ptr, struct vector *
 	}
 	
 	
-	endV = v[k-1][l-1];
+	/*endV = v[k-1][l-1];*/
 	
 	
 	
@@ -1234,8 +1235,7 @@ float methodmult(struct profile p, int lenA, int lenB, int nseqs, int cp){
 #endif	
 	if(!nofile){
 		if( (p.nA + p.nB) == nseqs){
-			printf("\nScore is:\n");
-			printf("%f\n", v[lenA][lenB]);
+                printf("\nScore is: %f\n", v[lenA][lenB]);
 		}
 	}
 	
@@ -1316,7 +1316,7 @@ void print_data_content2(struct vector *current_ptr){
  * Returns:		float arrayX
  */
 float **data_content(struct vector *current_ptr, float **arrayX){
-	struct vector *old_ptr;
+        /* struct vector *old_ptr; */
 	while(current_ptr!=NULL) {
 		if (current_ptr->base=='-')
 			arrayX[current_ptr->pos][5] +=sdata[current_ptr->seqID].weight;
@@ -1333,7 +1333,7 @@ float **data_content(struct vector *current_ptr, float **arrayX){
 		arrayX[current_ptr->pos][6] +=current_ptr->p0;
 		arrayX[current_ptr->pos][7] +=current_ptr->p1;
 		arrayX[current_ptr->pos][8] +=current_ptr->p2;
-		old_ptr= current_ptr;
+		/* old_ptr= current_ptr; */
 		current_ptr = current_ptr->previous_ptr;
 
 	}
