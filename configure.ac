@@ -31,7 +31,7 @@ AC_SUBST(NODOT_VERSION)
 # Autoconf-Manual, p. 60
 AC_PROG_CC
 # Autoconf-Manual, p. 20, 60
-CFLAGS="${CFLAGS} -ansi -Wall -O2"
+CFLAGS="${CFLAGS} -ansi -Wall -O3 -g"
 
 # Autoconf-Manual, p. 35
 AC_PROG_INSTALL

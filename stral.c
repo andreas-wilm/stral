@@ -88,9 +88,13 @@
 #include "bionj.h"
 
 
-#if 0
-#define DEBUG 1
+#if 1
+#define DEBUG 0
 #endif 
+
+/* FIXME make user vars */
+#define PROBDIR "./bp-probs"
+#define RESULTDIR "./results"
 
 float alpha= 8;
 float gapOpenM= 8;
@@ -127,16 +131,18 @@ float MsaPwIdent(MSA *msa);
 static char usage[]  = "\
 	Usage: stral [-options] <seqfile>\n\
 	Available options:\n\
-	-A    : report per-sequence info, not just a summary\n\
 	-G    : help; display usage and version\n\
 ";  
-
+/*
+	-A    : report per-sequence info, not just a summary\n\
+*/
 static char experts[] = "\
-	--gccomp       : with -a, include GC composition in report (DNA/RNA only)\n\
 	--informat <s> : specify sequence file format <s>\n\
-	--quiet        : suppress verbose header (used in regression testing)\n\
 ";
-
+/* 	
+	--quiet        : suppress verbose header (used in regression testing)\n\
+  --gccomp       : with -a, include GC composition in report (DNA/RNA only)\n\ 
+*/
 struct opt_s OPTIONS[] = {
      { "-a", TRUE, sqdARG_NONE },    
      { "-h", TRUE, sqdARG_NONE },    
@@ -161,10 +167,11 @@ int main(int argc, char **argv){
      MSA *msa; /* multiple sequence alignment   */  
      int type,i; /* kAmino, kDNA, kRNA, or kOtherSeq */
   	
+#if 0
      int allreport; /* TRUE to do a short table for each sequence */
      int be_quiet; /* TRUE to suppress header */
      int do_gccomp; /* TRUE to include GC composition in per-seq report */
-  
+#endif
      char *optname;
      char *optarg;
      int optind;
@@ -185,11 +192,12 @@ int main(int argc, char **argv){
      unsigned char *hash;
 		
      fmt       = SQFILE_UNKNOWN;	/* default: autodetect format  */
+#if 0
      allreport = FALSE;				/* default: file summary only  */
      be_quiet  = FALSE;				/* show header info by default */
-     type      = kOtherSeq;		/* just to silence gcc uninit warning */
      do_gccomp = FALSE;
-
+#endif
+     type      = kOtherSeq;		/* just to silence gcc uninit warning */
      if (argc<2)
           usagestral();
 
@@ -323,13 +331,15 @@ int main(int argc, char **argv){
 
   
      while (Getopt(argc, argv, OPTIONS, NOPTIONS, usage, &optind, &optname, &optarg)){
+#if 0
           if      (strcmp(optname, "-a")       == 0)  
                allreport = TRUE; 
           else if (strcmp(optname, "--quiet")  == 0)  
                be_quiet  = TRUE; 
           else if (strcmp(optname, "--gccomp") == 0)  
                do_gccomp = TRUE; 
-          else if (strcmp(optname, "--informat") == 0) {
+#endif
+          if (strcmp(optname, "--informat") == 0) {
                fmt = String2SeqfileFormat(optarg);
                if (fmt == SQFILE_UNKNOWN) 
                     Die("unrecognized sequence file format \"%s\"", optarg);
@@ -390,14 +400,14 @@ int main(int argc, char **argv){
      }
 
      /* FIXME make var */
-     if (opendir("./probDIR")==NULL){
-          mkdir("./probDIR",mode | S_IRGRP | S_IXGRP| S_IXOTH | S_IROTH);
+     if (opendir(PROBDIR)==NULL){
+          mkdir(PROBDIR, mode | S_IRGRP | S_IXGRP| S_IXOTH | S_IROTH);
      }
-     chdir("./probDIR");
+     chdir(PROBDIR);
 
 
 	
-     while (ReadSeq(dbfp, dbfp->format, &seq, &sqinfo)){
+     while (ReadSeq(dbfp, dbfp->format, &seq, &sqinfo)) {
           int i;
           char *hashfilename;
 				
@@ -479,10 +489,10 @@ int main(int argc, char **argv){
           align(nseqs,seqfile);
           if (!nofile){
                chdir(workingdir);
-               if (opendir("./resultDIR")==NULL){
-                    mkdir("./resultDIR",mode| S_IRGRP | S_IXGRP| S_IXOTH | S_IROTH);
+               if (opendir(RESULTDIR)==NULL){
+                    mkdir(RESULTDIR, mode| S_IRGRP | S_IXGRP| S_IXOTH | S_IROTH);
                }
-               chdir("./resultDIR");
+               chdir(RESULTDIR);
           }
           createDistanceMatrix(array, nseqs);
 
@@ -541,10 +551,10 @@ int main(int argc, char **argv){
           prof[0].nB=1;
           if(!nofile){
                chdir(workingdir);
-               if (opendir("./resultDIR")==NULL){
-                    mkdir("./resultDIR",mode| S_IRGRP | S_IXGRP| S_IXOTH | S_IROTH);
+               if (opendir(RESULTDIR)==NULL){
+                    mkdir(RESULTDIR, mode| S_IRGRP | S_IXGRP| S_IXOTH | S_IROTH);
                }
-               chdir("./resultDIR");
+               chdir(RESULTDIR);
           }
 	
      }
@@ -602,11 +612,12 @@ int main(int argc, char **argv){
 		
 	
      if(!nofile){	
-          printf("\nprogram exited normally\n");
+          printf("\nProgram exited normally\n");
+          printf("See %s for results\n", RESULTDIR);
      } else {
           print2stdout(nseqs);
           /* FIXME make var */
-          remove("./probDIR"); 
+          remove(PROBDIR); 
           remove(wname);
           remove("outfile");	
           remove("outtree");	
@@ -695,6 +706,9 @@ void usagestral(void){
 			"\t[-p] printing pairwise alignments to file <FALSE>\n"
 			"\t[-n] don't print program output to files <FALSE>\n"
 			"\t[-V] be verbose <TRUE>\n", alpha,gapOpen,gapExt,gapExtM,gapOpenM);
+     printf("NOTE: stral will create the following directories:\n");
+            printf("\t%s: for storing base-pair probabilty matrices\n", PROBDIR);
+            printf("\t%s: for storing results\n", RESULTDIR);
      exit(1);
 }
 

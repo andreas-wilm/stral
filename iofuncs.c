@@ -1,3 +1,4 @@
+/* -*- c-file-style: "k&r"; indent-tabs-mode: nil; -*- */
 #include "config.h"
 
 #include <stdio.h>
@@ -98,88 +99,92 @@ void print2probfile(struct vector *ptr){
  * Returns:		void
  */
 int readfromprobfile(char *filename, int n){
-	char buffer[34];
-	int seqlen;
-	FILE *fz;
-	if ((fz = fopen(filename, "r"))==NULL){
-		return 0;
-	} else {
+        const int bufsize = 128;
+        char *buffer;
+        int seqlen;
+        FILE *fz;
 		int count=0;
+
+        if ((fz = fopen(filename, "r"))==NULL){
+                return 0;
+        }
+
+        buffer = malloc(bufsize * sizeof(char));
 		last_ptr[n] = first_ptr[n] = NULL;
-		while(fgets(buffer, 34, fz)){
-			if (count == 0){
-				if (strncmp(buffer,VERSION,5)){
-					printf("version conflict in file %s\n", filename);
-					printf("please remove file from probDIR\n");
-					exit(1);				
-				}				
-			}
-			if (count == 2){
-				
-				sscanf(buffer,"%d",&seqlen);
-				if (seqlen!=sdata[n].seqlength){
-					printf("input sequence and prob-file sequence differ (in length %d vs %d) %s\n", seqlen,sdata[n].seqlength, filename);
-					printf("please remove file from probDIR\n");
-					exit(1);				
-				}				
-			}
-			if (count > 2){
-				struct vector *new_item_ptr;
-				double p0 = -1;
-				double p1 = -1;
-				double p2 = -1;
-				int rb = -1;
-				char p[8];
-				int i, j;
-				
-				new_item_ptr = malloc (sizeof (struct vector));
-				new_item_ptr->seqID = sdata[n].seqID;
-				for (i = 0; i < strlen(buffer); ++i){
-					if (i==0){
-						new_item_ptr->base = buffer[i];
-					} else if (i==2){
-						sscanf(&buffer[2],"%d", &rb);
-						new_item_ptr->replbase = rb;
-					} else if (i==4){
-						for (j=0; j<8; ++j){
-							p[j]=buffer[i];
-							++i;
-						}
-						sscanf(p,"%lf", &p0);
-						new_item_ptr->p0 = p0;
-					} else if (i==13){
-						for (j=0; j<8; ++j){
-							p[j]=buffer[i];
-							++i;
-						}
-						sscanf(p,"%lf", &p1);
-						new_item_ptr->p1 = p1;
-					} else if (i==22){
-						for (j=0; j<8; ++j){
-							p[j]=buffer[i];
-							++i;
-						}
-						sscanf(p,"%lf", &p2);
-						new_item_ptr->p2 = p2;
-					} else if (i==31){
-						new_item_ptr->oribase = buffer[i];
-					}
-				}
-				new_item_ptr->next_ptr = first_ptr[n];
-				if (last_ptr[n] == NULL){
-					last_ptr[n] = new_item_ptr;
-					last_ptr[n]->previous_ptr = NULL;
-				} else {
-					new_item_ptr->next_ptr->previous_ptr = new_item_ptr;
-					new_item_ptr->previous_ptr = NULL;
-				}
-				first_ptr[n] = new_item_ptr;
-		
-			}
-			++count;
+		while(fgets(buffer, bufsize, fz)){
+             if (count == 0){
+                  if (strncmp(buffer,VERSION,5)){
+                       fprintf(stderr, "file %s was created with a different stral version. \n", filename);
+                       fprintf(stderr, "please remove file and rerun\n");
+                       exit(1);				
+                  }				
+             }
+             if (count == 2){
+                  /*fprintf(stderr, "DEBUG(%s:%s): buffer=%s\n", __FILE__, __FUNCTION__, buffer);*/
+                  sscanf(buffer,"%d", &seqlen);
+                  if (seqlen!=sdata[n].seqlength){
+                       fprintf(stderr, "input sequence and prob-file sequence differ (in length %d vs %d) %s\n", seqlen, sdata[n].seqlength, filename);
+                       fprintf(stderr, "please remove file and rerun\n");
+                       exit(1);				
+                  }				
+             }
+             if (count > 2){
+                  struct vector *new_item_ptr;
+                  double p0 = -1;
+                  double p1 = -1;
+                  double p2 = -1;
+                  int rb = -1;
+                  char p[8];
+                  int i, j;
+                  
+                  new_item_ptr = malloc (sizeof (struct vector));
+                  new_item_ptr->seqID = sdata[n].seqID;
+                  for (i = 0; i < strlen(buffer); ++i){
+                       if (i==0){
+                            new_item_ptr->base = buffer[i];
+                       } else if (i==2){
+                            sscanf(&buffer[2],"%d", &rb);
+                            new_item_ptr->replbase = rb;
+                       } else if (i==4){
+                            for (j=0; j<8; ++j){
+                                 p[j]=buffer[i];
+                                 ++i;
+                            }
+                            sscanf(p,"%lf", &p0);
+                            new_item_ptr->p0 = p0;
+                       } else if (i==13){
+                            for (j=0; j<8; ++j){
+                                 p[j]=buffer[i];
+                                 ++i;
+                            }
+                            sscanf(p,"%lf", &p1);
+                            new_item_ptr->p1 = p1;
+                       } else if (i==22){
+                            for (j=0; j<8; ++j){
+                                 p[j]=buffer[i];
+                                 ++i;
+                            }
+                            sscanf(p,"%lf", &p2);
+                            new_item_ptr->p2 = p2;
+                       } else if (i==31){
+                            new_item_ptr->oribase = buffer[i];
+                       }
+                  }
+                  new_item_ptr->next_ptr = first_ptr[n];
+                  if (last_ptr[n] == NULL){
+                       last_ptr[n] = new_item_ptr;
+                       last_ptr[n]->previous_ptr = NULL;
+                  } else {
+                       new_item_ptr->next_ptr->previous_ptr = new_item_ptr;
+                       new_item_ptr->previous_ptr = NULL;
+                  }
+                  first_ptr[n] = new_item_ptr;
+                  
+             }
+             ++count;
 		}
+        free(buffer);
 		return 1;
-	}
 }
 
 /* Function:		printdistmatrix
