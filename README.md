@@ -32,19 +32,16 @@ GCC (setting CC to gcc-mp-4.8 worked for me) or experiment with
 
 After a first checkout you will need to setup automake once:
 
-    $ ./reconf
+    $ ./bootstrap
 
-and possibly (if reconf complains accordingly) followed by:
+If you see correspondong warnings you might also need to run:
 
     $ automake --add-missing
 
-and also (if ltmain.sh is not found):
+Should ltmain.sh be mising please also run:
 
-    $ [g]libtoolize
+    $ [g]libtoolize && ./bootstrap
 
-followed again by 
-
-    $ ./reconf
 
 After that configure and Makefile.in's will have been generated and
 you can do the GNU triple jump:
