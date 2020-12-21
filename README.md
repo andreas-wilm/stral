@@ -15,12 +15,18 @@ Differences from the original 0.5.4:
 
 ## Requirements:
 
-StrAl requires ViennaRNA (version 1.8; not 2!), squid library 1.9g and
-the mhash library to be installed beforehand. You can find copies of
-versions which are known to work in the third-party folder.
-
-If you install these libraries to non-standard directories let configure
-know by modifying LDFLAGS and CFLAGS on the commandline.
+StrAl requires ViennaRNA (version 1.8; not 2!), Sean Eddy's Squid library
+1.9g and the Mhash library to be installed beforehand. You can find copies of
+versions which are known to work in the third-party folder of Stral's source code.
+For each package, use the GNU triple jump to install it:
+`./configure && make && sudo make install`. If you are not root, use
+`./configure --prefix SOMEPATH` to install the packages to `SOMEPATH`
+you have access to. In that case, let Stral's `configure`
+know about the path by modifying LDFLAGS and CFLAGS on the commandline.
+This is done by setting the CFLAGS and LDFLAGS environment variables.
+For example, if you installed packages to `$HOME/local` run
+`export CFLAGS="-I$HOME/local` and `export LDFLAGS="-L$HOME/local/`
+before running `./configure`.
 
 Notes on ViennaRNA: On OsX, if you get `"ld: symbol(s) not found for
 architecture x86_64"` while compiling/installing ViennaRNA try a newer
